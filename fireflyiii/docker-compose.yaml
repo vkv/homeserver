@@ -1,0 +1,48 @@
+version: '3.3'
+
+services:
+  firefly:
+    container_name: firefly
+    image: jc5x/firefly-iii
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_FIREFLY}
+      - PGID=${PGID_FIREFLY}
+      - DB_CONNECTION=mysql
+      - DB_HOST=fireflyiiidb
+      - DB_PORT=${FIREFLY_DB_PORT}
+      - DB_DATABASE=${FIREFLY_MYSQL_DATABASE}
+      - DB_USERNAME=${FIREFLY_MYSQL_USER}
+      - DB_PASSWORD=${FIREFLY_MYSQL_PASSWORD}
+      - APP_URL=${FIREFLY_APP_URL}
+      - APP_KEY=${FIREFLY_APP_KEY}
+      - TRUSTED_PROXIES=${FIREFLY_PROXY}
+    volumes:
+      - ${CONFIG}/fireflyiii/export:/var/www/firefly-iii/storage/export
+      - ${CONFIG}/fireflyiii/upload:/var/www/firefly-iii/storage/upload
+    ports:
+      - ${FIREFLY_HTTP}:8080
+    depends_on:
+      - fireflyiiidb
+
+  fireflyiiidb:
+    image: linuxserver/mariadb
+    container_name: firefly_db
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_FIREFLY}
+      - PGID=${PGID_FIREFLY}
+      - MYSQL_USER=${FIREFLY_MYSQL_USER}
+      - MYSQL_DATABASE=${FIREFLY_MYSQL_DATABASE}
+      - MYSQL_PASSWORD=${FIREFLY_MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${FIREFLY_MYSQL_ROOT_PASSWORD}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG}/fireflyiii/db:/config
+    ports:
+      - ${FIREFLY_DB_PORT}:3306
+
+networks:
+  default:
+    external:
+      name: intranet

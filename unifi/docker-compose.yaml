@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+  unifi-controller:
+    image: linuxserver/unifi-controller
+    container_name: unifi
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_UNIFI}
+      - PGID=${PGID_UNIFI}
+      - MEM_LIMIT=2048M
+    volumes:
+      - ${CONFIG}/unifi:/config
+    ports:
+      - ${UNIFI_STUN}:3478/udp
+      - ${UNIFI_DISCOVERY}:10001/udp
+      - ${UNIFI_DEVCTRL}:8080
+      - ${UNIFI_HTTPS}:8443
+      - ${UNIFI_HTTP}:8880
+      - ${UNIFI_SPEEDTEST}:6789
+      - ${UNIFI_SYSLOG_CAP}:5514
+
+networks:
+  default:
+    external:
+      name: intranet

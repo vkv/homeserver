@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  shaarli:
+    image: radhifadlillah/shiori
+    container_name: shiori
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_SHIORI}
+      - PGID=${PGID_SHIORI}
+      - TZ=${TZ}
+    volumes:
+      -  ${CONFIG}/shiori:/srv/shiori
+    ports:
+      - ${SHIORI_HTTP}:8080
+
+networks:
+  default:
+    external:
+      name: intranet

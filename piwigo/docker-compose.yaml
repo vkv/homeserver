@@ -1,0 +1,38 @@
+version: "3.3"
+services:
+  piwigo:
+    image: linuxserver/piwigo
+    container_name: piwigo
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_PIWIGO}
+      - PGID=${PGID_PIWIGO}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG}/piwigo:/config
+      - ${CONFIG}/piwigo/pictures:/pictures
+    ports:
+      - ${PIWIGO_HTTP}:80
+    depends_on: 
+      - piwigo-db
+
+  piwigo-db:
+    image: linuxserver/mariadb
+    container_name: piwigo-db
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_PIWIGO}
+      - PGID=${PGID_PIWIGO}
+      - MYSQL_USER=${PIWIGO_MYSQL_USER}  
+      - MYSQL_DATABASE=${PIWIGO_MYSQL_DATABASE}
+      - MYSQL_PASSWORD=${PIWIGO_MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${PIWIGO_MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ${CONFIG}/piwigo-db:/config
+    ports:
+      - ${PIWIGO_DB_PORT}:3306
+
+networks:
+  default:
+    external:
+      name: intranet

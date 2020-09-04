@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+  code-server:
+    image: linuxserver/code-server
+    container_name: code-server
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_CODE}
+      - PGID=${PGID_CODE}
+      - TZ=${TZ}
+      - PASSWORD=${CODE_PASSWORD}
+      - SUDO_PASSWORD=${CODE_ROOT_PASSWORD}
+    volumes:
+      - ${CONFIG}/code:/config
+    ports:
+      - ${CODE_HTTP}:8443
+
+networks:
+  default:
+    external:
+      name: intranet

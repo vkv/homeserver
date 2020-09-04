@@ -1,0 +1,20 @@
+version: "3.3"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/heimdall:/config
+    environment:
+      - PUID=${PUID_HEIMDALL}
+      - PGID=${PGID_HEIMDALL}
+      - TZ=${TZ}
+    ports:
+      - ${HEIMDALL_HTTP}:80
+      - ${HEIMDALL_HTTPS}:443
+    
+networks:
+  default:
+    external:
+      name: intranet

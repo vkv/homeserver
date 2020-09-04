@@ -1,0 +1,112 @@
+version: "3.3"
+services:
+
+  deluge:
+    container_name: deluge
+    image: linuxserver/deluge:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    volumes:
+      - ${MEDIA_DOWNLOADS}:/downloads # downloads folder
+      - ${CONFIG}/deluge:/config # config files
+
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DOWNLOADS}/torrent-blackhole:/downloads # place where to put .torrent files for manual download
+      - ${CONFIG}/jackett:/config # config files
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${CONFIG}/sonarr:/config # config files
+      - ${MEDIA_TV}:/tv # tv shows folder
+      - ${MEDIA_DOWNLOADS}:/downloads # download folder
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${CONFIG}/radarr:/config # config files
+      - ${MEDIA_MOVIES}:/movies # movies folder
+      - ${MEDIA_DOWNLOADS}:/downloads # download folder
+
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - TZ=${TZ} # timezone, defined in .env
+    tmpfs: /transcode
+    volumes:
+      - ${CONFIG}/plex/db:/config # plex database
+      - ${MEDIA_MOVIES}:/data/movies # media library
+      - ${MEDIA_TV}:/data/tv # media library
+
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    volumes:
+      - ${CONFIG}/bazarr:/config # config files
+      - ${MEDIA_MOVIES}:/movies # movies folder
+      - ${MEDIA_TV}:/tv # tv shows folderc
+
+  ombi:
+    container_name: ombi
+    image: linuxserver/ombi
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+      - BASE_URL=/ #optional
+    volumes:
+      - ${CONFIG}/ombi:/config
+
+  tautulli:
+    container_name: tautulli
+    image: linuxserver/tautulli
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=${PUID_MEDIA} # default user id, defined in .env
+      - PGID=${PGID_MEDIA} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    volumes:
+      - ${CONFIG}/tautulli:/config # config files
+      - ${CONFIG}/plex/db/Library/Application Support/Plex Media Server/Logs:/logs:ro #plex logs
