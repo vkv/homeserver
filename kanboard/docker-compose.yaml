@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  kanboard:
+    image: kanboard/kanboard:latest
+    container_name: kanboard
+    restart: unless-stopped
+    environment: 
+      - PUID=${PUID_KANBOARD} 
+      - PGID=${PGID_KANBOARD}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG}/kanboard/data:/var/www/app/data
+      - ${CONFIG}/kanboard/plugins:/var/www/app/plugins
+      - ${CONFIG}/kanboard/ssl:/etc/nginx/ssl
+    ports:
+      - ${KANBOARD_HTTP}:80
+      - ${KANBOARD_HTTPS}:443
+    
+networks:
+  default:
+    external:
+      name: intranet
