@@ -14,7 +14,6 @@ services:
       - ${CONFIG}/kanboard/ssl:/etc/nginx/ssl
     ports:
       - ${KANBOARD_HTTP}:80
-      - ${KANBOARD_HTTPS}:443
     
 networks:
   default:

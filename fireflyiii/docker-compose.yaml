@@ -24,6 +24,18 @@ services:
       - ${FIREFLY_HTTP}:8080
     depends_on:
       - fireflyiiidb
+    networks:
+      - intranet
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.firefly_iii.loadbalancer.server.port=8080" #literally necessary, traefik can't figure it out on it's own for some reason
+      - "traefik.http.routers.firefly-web.rule=Host(`${FIREFLY_DOMAIN}`)"
+      - "traefik.http.routers.firefly-web.entrypoints=web"
+      - "traefik.http.routers.firefly-web.middlewares=redirect@file"
+      - "traefik.http.routers.firefly-secured.rule=Host(`${FIREFLY_DOMAIN}`)"
+      - "traefik.http.routers.firefly-secured.entrypoints=web-secured"
+      - "traefik.http.routers.firefly-secured.tls.certresolver=mytlschallenge"
 
   fireflyiiidb:
     image: linuxserver/mariadb
@@ -41,8 +53,11 @@ services:
       - ${CONFIG}/fireflyiii/db:/config
     ports:
       - ${FIREFLY_DB_PORT}:3306
+    networks:
+      - intranet
 
 networks:
-  default:
-    external:
-      name: intranet
+  web:
+    external: true
+  intranet:
+    external: true

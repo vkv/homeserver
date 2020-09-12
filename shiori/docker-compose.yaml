@@ -1,6 +1,6 @@
 version: "3.3"
 services:
-  shaarli:
+  shiori:
     image: radhifadlillah/shiori
     container_name: shiori
     restart: unless-stopped
@@ -9,11 +9,23 @@ services:
       - PGID=${PGID_SHIORI}
       - TZ=${TZ}
     volumes:
-      -  ${CONFIG}/shiori:/srv/shiori
+      - ${CONFIG}/shiori:/srv/shiori
     ports:
       - ${SHIORI_HTTP}:8080
-
+    networks:
+      - intranet
+      - web
+    labels:
+      - "traefik.enable=true" # <== Enable traefik to proxy this container
+      - "traefik.http.routers.shiori-web.rule=Host(`${SHIORI_DOMAIN}`)" # <== Your Domain Name goes here for the http rule
+      - "traefik.http.routers.shiori-web.entrypoints=web" # <== Defining the entrypoint for http, **ref: line 30
+      - "traefik.http.routers.shiori-web.middlewares=redirect@file" # <== This is a middleware to redirect to https
+      - "traefik.http.routers.shiori-secured.rule=Host(`${SHIORI_DOMAIN}`)" # <== Your Domain Name for the https rule 
+      - "traefik.http.routers.shiori-secured.entrypoints=web-secured" # <== Defining entrypoint for https, **ref: line 31
+      - "traefik.http.routers.shiori-secured.tls.certresolver=mytlschallenge" # <== Defining certsresolvers for https
+      
 networks:
-  default:
-    external:
-      name: intranet
+  web:
+    external: true
+  intranet:
+    external: true

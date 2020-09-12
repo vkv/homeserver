@@ -1,20 +1,33 @@
 version: "3.3"
 services:
   nextcloud:
-    image: linuxserver/nextcloud
+    image: nextcloud
     container_name: nextcloud
     restart: unless-stopped
     environment:
       - PUID=${PUID_NEXTCLOUD}
       - PGID=${PGID_NEXTCLOUD}
       - TZ=${TZ}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_DOMAIN}
+      #- TRUSTED_PROXIES=
     volumes:
-      -  ${CONFIG}/nextcloud:/config
       - /data/nextcloud:/data
+      - ${CONFIG}/nextcloud/app:/var/www/html #during gui install, select /data as data folder
     ports:
-      - ${NEXTCLOUD_HTTPS}:443
+      - ${NEXTCLOUD_HTTPS}:80
     depends_on:
-      - nextclouddb
+      - nextclouddb    
+    networks:
+      - intranet
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud-web.rule=Host(`${NEXTCLOUD_DOMAIN}`)"
+      - "traefik.http.routers.nextcloud-web.entrypoints=web"
+      - "traefik.http.routers.nextcloud-web.middlewares=redirect@file"
+      - "traefik.http.routers.nextcloud-secured.rule=Host(`${NEXTCLOUD_DOMAIN}`)"
+      - "traefik.http.routers.nextcloud-secured.entrypoints=web-secured"
+      - "traefik.http.routers.nextcloud-secured.tls.certresolver=mytlschallenge"
 
   nextclouddb:
     image: linuxserver/mariadb
@@ -32,8 +45,11 @@ services:
       - ${CONFIG}/nextcloud/db:/config
     ports:
       - ${NEXTCLOUD_DB_PORT}:3306
+    networks:
+      - intranet
 
 networks:
-  default:
-    external:
-      name: intranet
+  web:
+    external: true
+  intranet:
+    external: true

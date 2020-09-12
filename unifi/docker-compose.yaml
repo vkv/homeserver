@@ -13,7 +13,7 @@ services:
     ports:
       - ${UNIFI_STUN}:3478/udp
       - ${UNIFI_DISCOVERY}:10001/udp
-      - ${UNIFI_DEVCTRL}:8080
+      - ${UNIFI_INFORM}:8080
       - ${UNIFI_HTTPS}:8443
       - ${UNIFI_HTTP}:8880
       - ${UNIFI_SPEEDTEST}:6789
