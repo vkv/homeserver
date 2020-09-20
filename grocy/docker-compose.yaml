@@ -1,0 +1,20 @@
+version: "3.3"
+services:
+  grocy:
+    image: linuxserver/grocy
+    container_name: grocy
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID_GROCY}
+      - PGID=${PGID_GROCY}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG}/grocy:/config
+    ports:
+      - ${GROCY_HTTP}:80
+    networks:
+      - intranet
+
+networks:
+  intranet:
+    external: true
